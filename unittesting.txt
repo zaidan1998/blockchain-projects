@@ -1,0 +1,44 @@
+const { assert } = require('chai')
+const { default: Web3 } = require('web3')
+
+const Regulator = artifacts.require('Regulator');
+
+require('chai')
+    .use(require('chai-as-promised'))
+    .should()
+
+contract('Regulator', (accounts) =>{
+
+    let regulator;
+    const deposit = web3.utils.toBN(2);
+
+    before(async () => {
+        regulator = await Regulator.deployed();
+    })
+
+    describe('deployment', async () => {
+        it('deploys successfully', async () => {
+            // check if the address is valid
+            const address = await regulator.address
+            assert.notEqual(address, 0x0)
+            assert.notEqual(address, '')
+            assert.notEqual(address, null)
+            assert.notEqual(address, undefined)
+        })
+        
+        it('default threshold', async () => {
+            const threshold = await regulator.threshold()
+            assert.equal(threshold, 10000000000000000000)
+        })
+    })
+
+    describe('should deposit successfully', async () => {
+
+        it('should deploy successfully and compare with balance', async () => {
+            await regulator.deposit( {from : accounts[1], value:100});
+            const balance = await regulator.check_balance({from:accounts[1]});
+            assert.equal(100, balance);
+        })
+    })
+
+});
